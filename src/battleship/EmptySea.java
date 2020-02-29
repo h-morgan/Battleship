@@ -13,5 +13,31 @@ public class EmptySea extends Ship {
 	String getShipType() {
 		return "empty";
 	}
+	
+	/**
+	 * This method overrides shootAt() inherited from ship
+	 * Always returns false to indicate that nothing was hit
+	 */
+	@Override
+	public boolean shootAt(int row, int column) {
+		return false;
+	}
+	
+	/**
+	 * This method overrides isSunk() that is inherited from Ship
+	 * Always returns false to indicate that you didn't sink anything
+	 */
+	@Override
+	public boolean isSunk() {
+		return false;
+	}
+	
+	/**
+	 * Returns single-character String to use in Ocean's print method
+	 */
+	@Override
+	public String toString() {
+		return "-";
+	}
 
 }
