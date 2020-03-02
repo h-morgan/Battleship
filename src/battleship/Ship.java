@@ -43,6 +43,7 @@ public abstract class Ship {
 	//abstract methods - to be defined in subclasses
 	abstract String getShipType();
 	
+	
 	//regular methods - for all ships
 	/**	
 	 * Returns true if it is okay to put a ship of this length with its bow in this location, 
@@ -54,6 +55,40 @@ public abstract class Ship {
 	 * @return
 	 */
 	public boolean okToPlaceShipAt(int row, int column, boolean horizontal, Ocean ocean) {
+		if (horizontal) {
+			if (column + getLength() > 20) {
+				return false;
+			} else { 
+				for (int i = row - 1; i <= row + 1; i++) {
+					for (int j = row; j < row + getLength(); j++) {
+						try {
+							if (!ocean.getShipArray()[i][j].getShipType().contentEquals("empty")) {
+								return false;
+							}
+						} catch (Exception e) {
+							continue;
+						}
+					}
+
+				}
+			}
+		} else {
+			if (row + getLength() > 20) {
+				return false;
+			} else {
+				for (int i = row - 1; i < row + getLength() + 1; i++) {
+					for (int j = column - 1; j <= column + 1; j++) {
+						try {
+							if (!ocean.getShipArray()[i][j].getShipType().contentEquals("empty")) {
+								return false;
+							}
+						} catch (Exception e) {
+							continue;
+						}
+					}
+				}
+			}
+		}
 		return true;
 	}
 	
@@ -68,7 +103,23 @@ public abstract class Ship {
 	 * @param ocean
 	 */
 	public void placeShipAt(int row, int column, boolean horizontal, Ocean ocean) {
+		this.bowRow = row;
+		this.bowColumn = column;
+		this.horizontal = horizontal;
+		
+		// set references to the ship in the Ships array in Ocean object
+		if (horizontal) {
+			for (int j = column; j < column + getLength(); j++) {
+				ocean.getShipArray()[row][j] = this;
+			}
+		} else {
+			for (int i = row; i < row + getLength(); i++) {
+				ocean.getShipArray()[i][column] = this;
+			}
+		}
+		
 	}
+	
 	
 	/**
 	 * If part of the ship occupies the given row and column, and the ship hasn't been sunk
@@ -79,7 +130,20 @@ public abstract class Ship {
 	 * @return
 	 */
 	public boolean shootAt(int row, int column) {
-		return true;
+		if (!isSunk()) {
+			if (horizontal) {
+				if (row == this.bowRow && column < this.bowColumn + length) {
+					hit[column - this.bowColumn] = true;
+					return true;
+				}
+			} else {
+				if (row < this.bowRow + length && column == this.bowColumn) {
+					hit[row - this.bowRow] = true;
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	
@@ -87,6 +151,7 @@ public abstract class Ship {
 	 * @return true if every part of the ship has been hit, false otherwise
 	 */
 	public boolean isSunk() {
+		for (boolean b : hit) if (!b) return false;
 		return true;
 	}
 	
@@ -97,7 +162,7 @@ public abstract class Ship {
 	 */
 	@Override
 	public String toString() {
-		return "X";
+		return isSunk() ? "X" : "S";
 	}
 	
 	
